@@ -33,6 +33,7 @@
             ımageList1 = new ImageList(components);
             timer1 = new System.Windows.Forms.Timer(components);
             tabPage9 = new TabPage();
+            textBox1 = new TextBox();
             pictureBoxWP = new PictureBox();
             mesajKontrol_CheckBox = new CheckBox();
             exceldenNumaraAktar_btnClick = new Button();
@@ -169,6 +170,7 @@
             // tabPage9
             // 
             tabPage9.BackColor = SystemColors.Control;
+            tabPage9.Controls.Add(textBox1);
             tabPage9.Controls.Add(pictureBoxWP);
             tabPage9.Controls.Add(mesajKontrol_CheckBox);
             tabPage9.Controls.Add(exceldenNumaraAktar_btnClick);
@@ -185,6 +187,14 @@
             tabPage9.Size = new Size(1420, 588);
             tabPage9.TabIndex = 3;
             tabPage9.Text = "Whatsapp Veri Botu";
+            // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(818, 466);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(48, 23);
+            textBox1.TabIndex = 46;
+            textBox1.Text = "5";
             // 
             // pictureBoxWP
             // 
@@ -1356,5 +1366,6 @@
         private PictureBox pictureBox2;
         private PictureBox pictureBox1;
         private PictureBox pictureBox4;
+        private TextBox textBox1;
     }
 }

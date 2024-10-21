@@ -33,8 +33,6 @@ namespace BotHizmetleri
         {
             InitializeComponent();
             loaderPictureLisans.Visible = false;
-
-
             CheckForIllegalCrossThreadCalls = false;
             listBoxTaskDurum.DrawMode = DrawMode.OwnerDrawFixed; // ListBox'ın özelleştirilebilir çizim modunu ayarla
             listBoxTaskDurum.DrawItem += new DrawItemEventHandler(listBoxTaskDurum_DrawItem); // Çizim olayını tanımla
@@ -1328,10 +1326,10 @@ namespace BotHizmetleri
             pictureBoxWP.Visible = true;
             WpMesajGonder_BtnClick.Enabled = false;
             servisDurdurWp.Enabled = true;
-            cancellationTokenSource = new CancellationTokenSource(); // İptal kaynaklarını başlat
+            cancellationTokenSourceWP = new CancellationTokenSource(); // İptal kaynaklarını başlat
 
 
-            await SendMessages(cancellationTokenSource.Token); // Gönderme işlemini başlat
+            await SendMessages(cancellationTokenSourceWP.Token); // Gönderme işlemini başlat
 
 
             MessageBox.Show("İşlemeler tamamlandı.", "Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1389,7 +1387,8 @@ namespace BotHizmetleri
                         labelStatus.Text = $"Gönderiliyor: {firma} - {phone}";
                         row.Cells["Status"].Value = "Bekleniyor";
                         row.DefaultCellStyle.BackColor = Color.White;
-
+                        string popupEngelle = @" window.onbeforeunload = null;";
+                       await webView21.ExecuteScriptAsync(popupEngelle);
                         string message = $"{richTextBox1.Text}";
                         string url = $"https://web.whatsapp.com/send/?phone=9{phone}&text={Uri.EscapeDataString(message)}";
                         _urlWP = url;
@@ -1397,9 +1396,10 @@ namespace BotHizmetleri
                         // Sayfa yüklenmesini bekle
                         var navigationTask = NavigationCompletedAsync();
                         webView21.Source = new Uri(url);
-
+                        await webView21.ExecuteScriptAsync(popupEngelle);
+                        int sure = Convert.ToInt32(textBox1.Text + "000");
                         await navigationTask; // Sayfa yüklenene kadar bekler
-
+                        await Task.Delay(sure);
                         cancellationToken.ThrowIfCancellationRequested();
 
                         // Buradan sonrası mesaj gönderme işlemi ile devam eder...
@@ -1436,11 +1436,12 @@ namespace BotHizmetleri
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message.ToString(),"HATA");
+                MessageBox.Show(ex.Message.ToString(), "HATA");
                 throw ex;
             }
-            
+
         }
+     
 
         //private async Task SendMessages(CancellationToken cancellationToken)
         //{
