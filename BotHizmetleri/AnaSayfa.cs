@@ -1320,7 +1320,6 @@ namespace BotHizmetleri
             pictureBoxWP.Visible = false;
             servisDurdurWp.Enabled = false;
         }
-
         private async void WpMesajGonder_BtnClick_Click(object sender, EventArgs e)
         {
             pictureBoxWP.Visible = true;
@@ -1329,7 +1328,7 @@ namespace BotHizmetleri
             cancellationTokenSourceWP = new CancellationTokenSource(); // İptal kaynaklarını başlat
 
 
-            await SendMessages(cancellationTokenSourceWP.Token); // Gönderme işlemini başlat
+            await SendMessages(cancellationTokenSourceWP.Token, false); // Gönderme işlemini başlat
 
 
             MessageBox.Show("İşlemeler tamamlandı.", "Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1367,7 +1366,7 @@ namespace BotHizmetleri
 
         string _urlWP = "";
 
-        private async Task SendMessages(CancellationToken cancellationToken)
+        private async Task SendMessages(CancellationToken cancellationToken, bool onlyFailed)
         {
             try
             {
@@ -1384,64 +1383,73 @@ namespace BotHizmetleri
 
                     if (!string.IsNullOrEmpty(phone) && !string.IsNullOrEmpty(firma))
                     {
-                        labelStatus.Text = $"Gönderiliyor: {firma} - {phone}";
-                        row.Cells["Status"].Value = "Bekleniyor";
-                        row.DefaultCellStyle.BackColor = Color.White;
-                        string popupEngelle = @" window.onbeforeunload = null;";
-                       await webView21.ExecuteScriptAsync(popupEngelle);
-                        string message = $"{richTextBox1.Text}";
-                        string url = $"https://web.whatsapp.com/send/?phone=9{phone}&text={Uri.EscapeDataString(message)}";
-                        _urlWP = url;
-
-                        // Sayfa yüklenmesini bekle
-                        var navigationTask = NavigationCompletedAsync();
-                        webView21.Source = new Uri(url);
-                        await webView21.ExecuteScriptAsync(popupEngelle);
-                        int sure = Convert.ToInt32(textBox1.Text + "000");
-                        await navigationTask; // Sayfa yüklenene kadar bekler
-                        await Task.Delay(sure);
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        // Buradan sonrası mesaj gönderme işlemi ile devam eder...
-                        if (mesajKontrol_CheckBox.Checked)
+                        if (row.Cells["Status"].Value != "Başarılı")
                         {
-                            var deger = await MesajKontrol();
-                            if (!deger)
+
+
+                            labelStatus.Text = $"Gönderiliyor: {firma} - {phone}";
+                            row.Cells["Status"].Value = "Bekleniyor";
+                            row.DefaultCellStyle.BackColor = Color.White;
+                            string popupEngelle = @" window.onbeforeunload = null;";
+                            await webView21.ExecuteScriptAsync(popupEngelle);
+                            string message = $"{richTextBox1.Text}";
+                            string url = $"https://web.whatsapp.com/send/?phone=9{phone}&text={Uri.EscapeDataString(message)}";
+                            _urlWP = url;
+
+                            // Sayfa yüklenmesini bekle
+                            var navigationTask = NavigationCompletedAsync();
+                            webView21.Source = new Uri(url);
+                            await webView21.ExecuteScriptAsync(popupEngelle);
+                            int sure = Convert.ToInt32(textBox1.Text + "000");
+                            await navigationTask; // Sayfa yüklenene kadar bekler
+                            await Task.Delay(sure);
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            // Buradan sonrası mesaj gönderme işlemi ile devam eder...
+                            if (mesajKontrol_CheckBox.Checked)
+                            {
+                                var deger = await MesajKontrol();
+                                if (!deger)
+                                {
+                                    await ClickSendButtonAsync();
+                                }
+                            }
+                            else
                             {
                                 await ClickSendButtonAsync();
                             }
-                        }
-                        else
-                        {
-                            await ClickSendButtonAsync();
-                        }
 
-                        await Task.Delay(2000);
-                        var res = await MesajKontrol();
-                        await Task.Delay(2000);
-                        if (res)
-                        {
-                            row.Cells["Status"].Value = "Başarılı";
-                            row.DefaultCellStyle.BackColor = Color.DarkGreen;
-                            row.DefaultCellStyle.ForeColor = Color.White;
-                        }
-                        else
-                        {
-                            row.Cells["Status"].Value = "Hatalı";
-                            row.DefaultCellStyle.BackColor = Color.DarkRed;
-                            row.DefaultCellStyle.ForeColor = Color.White;
+                            await Task.Delay(4000);
+                            var res = await MesajKontrol();
+                            await Task.Delay(1000);
+                            if (res)
+                            {
+                                row.Cells["Status"].Value = "Başarılı";
+                                row.DefaultCellStyle.BackColor = Color.DarkGreen;
+                                row.DefaultCellStyle.ForeColor = Color.White;
+                            }
+                            else
+                            {
+                                row.Cells["Status"].Value = "Hatalı";
+                                row.DefaultCellStyle.BackColor = Color.DarkRed;
+                                row.DefaultCellStyle.ForeColor = Color.White;
+                            }
                         }
                     }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                MessageBox.Show("İşlem iptal edildi.", "İptal", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message.ToString(), "HATA");
-                throw ex;
+                throw;
             }
 
         }
-     
+
 
         //private async Task SendMessages(CancellationToken cancellationToken)
         //{
@@ -1592,8 +1600,19 @@ namespace BotHizmetleri
 
         private void wpSilBtn_Click(object sender, EventArgs e)
         {
-            dataGridViewWP.Rows.Clear();
-            dataGridViewWP.Columns.Clear();
+            if (dataGridViewWP.DataSource != null)
+            {
+                // Eğer DataSource kullanılıyorsa, DataSource'u null yaparak temizle
+                dataGridViewWP.DataSource = null;
+            }
+            else
+            {
+                // Eğer DataSource yoksa, satırları ve sütunları manuel olarak temizle
+                dataGridViewWP.Rows.Clear();
+                dataGridViewWP.Columns.Clear();
+            }
+
+            // RichTextBox'u temizle
             richTextBox1.Text = "Mesaj içeriğinizi buraya giriniz...";
         }
 
@@ -1641,7 +1660,7 @@ namespace BotHizmetleri
         {
             cancellationTokenSourceMailGonder = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSourceMailGonder.Token;
-            pictureBoxMail.Visible = true;
+
 
             string htmlContent = "";
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -1673,33 +1692,45 @@ namespace BotHizmetleri
 
             MailGonder_BtnClick.Enabled = false;
             servisiDurdurMailBtn.Enabled = true;
-            foreach (DataGridViewRow row in dataGridViewMail.Rows)
+            pictureBoxMail.Visible = true;
+            try
             {
-                var durum = row.Cells["Durum"].Value?.ToString();
-
-                if (string.IsNullOrEmpty(durum) || durum != "Başarılı")
+                foreach (DataGridViewRow row in dataGridViewMail.Rows)
                 {
-                    string email = row.Cells["Email"].Value?.ToString();
-                    bool mailSent = await SendEmailAsync(email, baslik_TextBox.Text, htmlContent, Convert.ToInt32(port_TextBox.Text), false, username_TextBox.Text, password_TextBox.Text, smt_TextBox.Text, cancellationToken);
+                    cancellationToken.ThrowIfCancellationRequested(); // İptal kontrolü
+                    var durum = row.Cells["Durum"].Value?.ToString();
 
-                    if (mailSent)
+                    if (string.IsNullOrEmpty(durum) || durum != "Başarılı")
                     {
-                        row.Cells["Durum"].Value = "Başarılı";
-                        row.Cells["Durum"].Style.BackColor = Color.Green;
+                        string email = row.Cells["Email"].Value?.ToString();
+                        bool mailSent = await SendEmailAsync(email, baslik_TextBox.Text, htmlContent, Convert.ToInt32(port_TextBox.Text), false, username_TextBox.Text, password_TextBox.Text, smt_TextBox.Text, cancellationToken);
+                        if (mailSent)
+                        {
+                            row.Cells["Durum"].Value = "Başarılı";
+                            row.Cells["Durum"].Style.BackColor = Color.Green;
+                        }
+                        else
+                        {
+                            row.Cells["Durum"].Value = "Başarısız";
+                            row.Cells["Durum"].Style.BackColor = Color.Red;
+                        }
                     }
-                    else
-                    {
-                        row.Cells["Durum"].Value = "Başarısız";
-                        row.Cells["Durum"].Style.BackColor = Color.Red;
-                    }
+
                 }
-
-
             }
-            MessageBox.Show("Servis tamamlandı.Aşağıdaki ekrandan kontrol edebilirsiniz.", "Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            MailGonder_BtnClick.Enabled = true;
-            servisiDurdurMailBtn.Enabled = false;
-            pictureBoxMail.Visible = false;
+            catch (OperationCanceledException)
+            {
+                MessageBox.Show("Mail gönderme işlemi iptal edildi.", "İptal", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            finally
+            {
+                MessageBox.Show("Servis tamamlandı.Aşağıdaki ekrandan kontrol edebilirsiniz.", "Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MailGonder_BtnClick.Enabled = true;
+                servisiDurdurMailBtn.Enabled = false;
+                pictureBoxMail.Visible = false;
+            }
+          
+          
         }
 
         public async Task<bool> SendEmailAsync(string aliciMails, string subject, string body, int port, bool enableSsl, string username, string password, string smtp, CancellationToken cancellationToken)
@@ -1746,12 +1777,12 @@ namespace BotHizmetleri
             }
             catch (OperationCanceledException)
             {
-                // İşlem iptal edildiğinde bu blok çalışır
                 return false;
             }
             catch (Exception ex)
             {
-                return false;
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}");
+                return false; // Başarısız mail gönderimi
             }
         }
 
@@ -1973,6 +2004,7 @@ namespace BotHizmetleri
                 cancellationTokenSourceMailGonder.Cancel(); // İptal sinyali gönder
                 MailGonder_BtnClick.Enabled = true;
                 servisiDurdurMailBtn.Enabled = false;
+                pictureBoxMail.Visible = false;
                 MessageBox.Show("Mail gönderme işlemi iptal edildi.", "İptal", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }

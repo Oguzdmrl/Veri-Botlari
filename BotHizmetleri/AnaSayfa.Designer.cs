@@ -33,6 +33,8 @@
             ımageList1 = new ImageList(components);
             timer1 = new System.Windows.Forms.Timer(components);
             tabPage9 = new TabPage();
+            groupBox11 = new GroupBox();
+            label5 = new Label();
             textBox1 = new TextBox();
             pictureBoxWP = new PictureBox();
             mesajKontrol_CheckBox = new CheckBox();
@@ -117,6 +119,7 @@
             aktivasyonBtn = new Button();
             tabControl1 = new TabControl();
             tabPage9.SuspendLayout();
+            groupBox11.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBoxWP).BeginInit();
             groupBox6.SuspendLayout();
             groupBox7.SuspendLayout();
@@ -170,7 +173,7 @@
             // tabPage9
             // 
             tabPage9.BackColor = SystemColors.Control;
-            tabPage9.Controls.Add(textBox1);
+            tabPage9.Controls.Add(groupBox11);
             tabPage9.Controls.Add(pictureBoxWP);
             tabPage9.Controls.Add(mesajKontrol_CheckBox);
             tabPage9.Controls.Add(exceldenNumaraAktar_btnClick);
@@ -188,11 +191,34 @@
             tabPage9.TabIndex = 3;
             tabPage9.Text = "Whatsapp Veri Botu";
             // 
+            // groupBox11
+            // 
+            groupBox11.Controls.Add(label5);
+            groupBox11.Controls.Add(textBox1);
+            groupBox11.ForeColor = Color.DarkSlateGray;
+            groupBox11.Location = new Point(1272, 457);
+            groupBox11.Name = "groupBox11";
+            groupBox11.Size = new Size(134, 48);
+            groupBox11.TabIndex = 47;
+            groupBox11.TabStop = false;
+            groupBox11.Text = "Gönderim Süresi";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label5.Location = new Point(71, 23);
+            label5.Name = "label5";
+            label5.Size = new Size(40, 15);
+            label5.TabIndex = 47;
+            label5.Text = "saniye";
+            label5.TextAlign = ContentAlignment.MiddleCenter;
+            // 
             // textBox1
             // 
-            textBox1.Location = new Point(818, 466);
+            textBox1.Location = new Point(35, 19);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(48, 23);
+            textBox1.Size = new Size(34, 23);
             textBox1.TabIndex = 46;
             textBox1.Text = "5";
             // 
@@ -240,7 +266,7 @@
             groupBox6.ForeColor = Color.Maroon;
             groupBox6.Location = new Point(885, 451);
             groupBox6.Name = "groupBox6";
-            groupBox6.Size = new Size(525, 54);
+            groupBox6.Size = new Size(381, 54);
             groupBox6.TabIndex = 31;
             groupBox6.TabStop = false;
             groupBox6.Text = "Durum";
@@ -442,7 +468,6 @@
             // webViewTiny
             // 
             webViewTiny.AllowExternalDrop = true;
-            webViewTiny.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             webViewTiny.CreationProperties = null;
             webViewTiny.DefaultBackgroundColor = Color.White;
             webViewTiny.ForeColor = Color.Black;
@@ -456,12 +481,11 @@
             // 
             baslik_TextBox.BackColor = Color.OldLace;
             baslik_TextBox.ForeColor = SystemColors.MenuText;
-            baslik_TextBox.Location = new Point(6, 21);
+            baslik_TextBox.Location = new Point(11, 22);
             baslik_TextBox.Name = "baslik_TextBox";
-            baslik_TextBox.PlaceholderText = "Başlık";
-            baslik_TextBox.Size = new Size(368, 23);
+            baslik_TextBox.PlaceholderText = "Konu";
+            baslik_TextBox.Size = new Size(390, 23);
             baslik_TextBox.TabIndex = 14;
-            baslik_TextBox.Text = "Deneme";
             // 
             // dosyaAdi_TextBox
             // 
@@ -763,9 +787,9 @@
             MailAdresleriniTara_BtnClick.ForeColor = Color.DarkSlateGray;
             MailAdresleriniTara_BtnClick.Image = (Image)resources.GetObject("MailAdresleriniTara_BtnClick.Image");
             MailAdresleriniTara_BtnClick.ImageAlign = ContentAlignment.MiddleLeft;
-            MailAdresleriniTara_BtnClick.Location = new Point(935, 25);
+            MailAdresleriniTara_BtnClick.Location = new Point(909, 25);
             MailAdresleriniTara_BtnClick.Name = "MailAdresleriniTara_BtnClick";
-            MailAdresleriniTara_BtnClick.Size = new Size(167, 43);
+            MailAdresleriniTara_BtnClick.Size = new Size(177, 43);
             MailAdresleriniTara_BtnClick.TabIndex = 47;
             MailAdresleriniTara_BtnClick.Text = "Mail Adreslerini Tara";
             MailAdresleriniTara_BtnClick.TextAlign = ContentAlignment.MiddleRight;
@@ -808,7 +832,7 @@
             // pictureBox5
             // 
             pictureBox5.Image = (Image)resources.GetObject("pictureBox5.Image");
-            pictureBox5.Location = new Point(255, 14);
+            pictureBox5.Location = new Point(575, 14);
             pictureBox5.Name = "pictureBox5";
             pictureBox5.Size = new Size(34, 29);
             pictureBox5.SizeMode = PictureBoxSizeMode.Zoom;
@@ -864,9 +888,9 @@
             listBoxTaskDurum.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
             listBoxTaskDurum.FormattingEnabled = true;
             listBoxTaskDurum.ItemHeight = 20;
-            listBoxTaskDurum.Location = new Point(295, 106);
+            listBoxTaskDurum.Location = new Point(295, 66);
             listBoxTaskDurum.Name = "listBoxTaskDurum";
-            listBoxTaskDurum.Size = new Size(341, 184);
+            listBoxTaskDurum.Size = new Size(341, 224);
             listBoxTaskDurum.TabIndex = 49;
             // 
             // groupBox3
@@ -1235,6 +1259,8 @@
             Resize += AnaSayfa_Resize;
             tabPage9.ResumeLayout(false);
             tabPage9.PerformLayout();
+            groupBox11.ResumeLayout(false);
+            groupBox11.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBoxWP).EndInit();
             groupBox6.ResumeLayout(false);
             groupBox6.PerformLayout();
@@ -1367,5 +1393,7 @@
         private PictureBox pictureBox1;
         private PictureBox pictureBox4;
         private TextBox textBox1;
+        private GroupBox groupBox11;
+        private Label label5;
     }
 }
