@@ -65,16 +65,8 @@ namespace BotHizmetleri
             dataGridView1.RowHeadersVisible = false; // Soldaki alanı gizler
             dataGridView1.ReadOnly = true; // sadece okunabilir olması yani veri düzenleme kapalı
             dataGridView1.AllowUserToDeleteRows = false; // satırların silinmesi engelleniyor
-            //dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dataGridView1.Columns[4].Width = 300;
             dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
-            dataGridView1.ScrollBars = ScrollBars.Both;
-
-            foreach (DataGridViewColumn column in dataGridView1.Columns)
-            {
-                column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-            }
-            dataGridView1.Columns[dataGridView1.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
             // Başlık hücrelerinin stilini ayarla
             dataGridView1.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font("Arial", 12); // Başlık fontu
@@ -130,14 +122,13 @@ namespace BotHizmetleri
 
             // Kolon boyutunu otomatik ayarlama
             dataGridViewMail.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None; // Otomatik ayarlama devre dışı
-            dataGridViewMail.Columns[0].Width = 200; // Firma kolonu genişliği
-            dataGridViewMail.Columns[1].Width = 200; // Email kolonu genişliği
-            dataGridView1.Columns[2].Width = 100; // Durum kolonu genişliği
-            // Yan kaydırmayı aktif et
-            dataGridViewMail.ScrollBars = ScrollBars.Both;
+            dataGridViewMail.Columns[0].Width = 180; // Firma kolonu genişliği
+            dataGridViewMail.Columns[1].Width = 180; // Email kolonu genişliği
+            dataGridViewMail.Columns[2].Width = 100; // Durum kolonu genişliği
+           
+            dataGridViewMail.RowHeadersVisible = false; // Soldaki alanı gizler
             dataGridViewMail.AllowUserToAddRows = false;
-            dataGridViewMail.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
+     
 
             #endregion
 
@@ -175,6 +166,8 @@ namespace BotHizmetleri
 
             hostingler_ComboBox.Items.Add("Hostinger");
             hostingler_ComboBox.Items.Add("Natro");
+            hostingler_ComboBox.Items.Add("Guzel Hosting");
+            hostingler_ComboBox.Items.Add("Özel");
             hostingler_ComboBox.SelectedIndex = 0;
             hostingler_ComboBox.SelectedIndexChanged += hostingler_ComboBox_SelectedIndexChanged;
             PopulateTextBoxes(hostingler_ComboBox.SelectedItem.ToString());
@@ -1647,6 +1640,14 @@ namespace BotHizmetleri
                 case "Natro":
                     smt_TextBox.Text = "mail.kurumsaleposta.com";
                     port_TextBox.Text = "587";
+                    break; 
+                case "Guzel Hosting":
+                    smt_TextBox.Text = "mail.alanadiniz.com";
+                    port_TextBox.Text = "587";
+                    break;
+                case "Özel":
+                    smt_TextBox.Text = "";
+                    port_TextBox.Text = "";
                     break;
             }
         }
@@ -1729,8 +1730,8 @@ namespace BotHizmetleri
                 servisiDurdurMailBtn.Enabled = false;
                 pictureBoxMail.Visible = false;
             }
-          
-          
+
+
         }
 
         public async Task<bool> SendEmailAsync(string aliciMails, string subject, string body, int port, bool enableSsl, string username, string password, string smtp, CancellationToken cancellationToken)
@@ -2134,7 +2135,10 @@ namespace BotHizmetleri
 
         }
 
+        private void tabPage7_Click(object sender, EventArgs e)
+        {
 
+        }
     }
 
 

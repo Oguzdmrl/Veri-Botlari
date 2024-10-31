@@ -189,7 +189,7 @@
             tabPage9.Name = "tabPage9";
             tabPage9.Size = new Size(1420, 588);
             tabPage9.TabIndex = 3;
-            tabPage9.Text = "Whatsapp Veri Botu";
+            tabPage9.Text = "Whatsapp Mesaj Botu";
             // 
             // groupBox11
             // 
@@ -398,7 +398,7 @@
             tabPage8.Name = "tabPage8";
             tabPage8.Size = new Size(1420, 588);
             tabPage8.TabIndex = 2;
-            tabPage8.Text = "E-Mail Veri Botu";
+            tabPage8.Text = "E-Mail Toplu Mail Botu";
             // 
             // pictureBoxMail
             // 
@@ -710,6 +710,7 @@
             tabPage7.Size = new Size(1420, 588);
             tabPage7.TabIndex = 1;
             tabPage7.Text = "Google Maps Veri Botu";
+            tabPage7.Click += tabPage7_Click;
             // 
             // totalMailLabel
             // 
