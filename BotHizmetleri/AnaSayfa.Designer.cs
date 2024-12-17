@@ -75,6 +75,8 @@
             username_TextBox = new TextBox();
             password_TextBox = new TextBox();
             tabPage7 = new TabPage();
+            groupBox12 = new GroupBox();
+            semophireSayi = new NumericUpDown();
             totalMailLabel = new Label();
             label10 = new Label();
             totalTelefonLabel = new Label();
@@ -135,6 +137,8 @@
             groupBox10.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
             tabPage7.SuspendLayout();
+            groupBox12.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)semophireSayi).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxMailTara).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             groupBox2.SuspendLayout();
@@ -686,6 +690,7 @@
             // tabPage7
             // 
             tabPage7.BackColor = SystemColors.Control;
+            tabPage7.Controls.Add(groupBox12);
             tabPage7.Controls.Add(totalMailLabel);
             tabPage7.Controls.Add(label10);
             tabPage7.Controls.Add(totalTelefonLabel);
@@ -711,6 +716,29 @@
             tabPage7.TabIndex = 1;
             tabPage7.Text = "Google Maps Veri Botu";
             tabPage7.Click += tabPage7_Click;
+            // 
+            // groupBox12
+            // 
+            groupBox12.Controls.Add(semophireSayi);
+            groupBox12.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            groupBox12.ForeColor = Color.FromArgb(0, 64, 0);
+            groupBox12.Location = new Point(14, 324);
+            groupBox12.Name = "groupBox12";
+            groupBox12.Size = new Size(99, 55);
+            groupBox12.TabIndex = 56;
+            groupBox12.TabStop = false;
+            groupBox12.Text = "Tarama Sayısı";
+            // 
+            // semophireSayi
+            // 
+            semophireSayi.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            semophireSayi.Location = new Point(26, 19);
+            semophireSayi.Maximum = new decimal(new int[] { 5, 0, 0, 0 });
+            semophireSayi.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            semophireSayi.Name = "semophireSayi";
+            semophireSayi.Size = new Size(41, 29);
+            semophireSayi.TabIndex = 55;
+            semophireSayi.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // totalMailLabel
             // 
@@ -860,6 +888,7 @@
             adresleriTara_CheckBox.TabIndex = 21;
             adresleriTara_CheckBox.Text = "Adres Bilgileri";
             adresleriTara_CheckBox.UseVisualStyleBackColor = true;
+            adresleriTara_CheckBox.Visible = false;
             // 
             // Il_ComboBox
             // 
@@ -1281,6 +1310,8 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
             tabPage7.ResumeLayout(false);
             tabPage7.PerformLayout();
+            groupBox12.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)semophireSayi).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxMailTara).EndInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             groupBox2.ResumeLayout(false);
@@ -1396,5 +1427,7 @@
         private TextBox textBox1;
         private GroupBox groupBox11;
         private Label label5;
+        private GroupBox groupBox12;
+        private NumericUpDown semophireSayi;
     }
 }

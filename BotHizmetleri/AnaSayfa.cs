@@ -1,6 +1,5 @@
 ﻿using BotHizmetleri.Models;
 using BotHizmetleri.Services;
-using MaterialSkin;
 using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
 using OfficeOpenXml;
@@ -8,7 +7,9 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Management;
 using System.Net;
@@ -20,7 +21,6 @@ namespace BotHizmetleri
 {
     public partial class AnaSayfa : Form
     {
-        private MaterialSkinManager materialSkinManager;
         ChromeOptions options = new();
         private string _lisansKey = "..";
         private bool _lisansDurum = false;
@@ -32,6 +32,7 @@ namespace BotHizmetleri
         public AnaSayfa()
         {
             InitializeComponent();
+            Application.ApplicationExit += (s, e) => KillChromeDrivers();
             loaderPictureLisans.Visible = false;
             CheckForIllegalCrossThreadCalls = false;
             listBoxTaskDurum.DrawMode = DrawMode.OwnerDrawFixed; // ListBox'ın özelleştirilebilir çizim modunu ayarla
@@ -70,12 +71,7 @@ namespace BotHizmetleri
 
             // Başlık hücrelerinin stilini ayarla
             dataGridView1.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font("Arial", 12); // Başlık fontu
-                                                                                                     //dataGridView1.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.None; // Otomatik boyutlandırmayı devre dışı bırak
-                                                                                                     //dataGridView1.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.None; // Otomatik boyutlandırmayı devre dışı bırak
-                                                                                                     //dataGridView1.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.None; // Otomatik boyutlandırmayı devre dışı bırak
-                                                                                                     //dataGridView1.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.None; // Otomatik boyutlandırmayı devre dışı bırak
-                                                                                                     //dataGridView1.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.None; // Otomatik boyutlandırmayı devre dışı bırak
-
+                                                                                                    
 
 
 
@@ -125,10 +121,10 @@ namespace BotHizmetleri
             dataGridViewMail.Columns[0].Width = 180; // Firma kolonu genişliği
             dataGridViewMail.Columns[1].Width = 180; // Email kolonu genişliği
             dataGridViewMail.Columns[2].Width = 100; // Durum kolonu genişliği
-           
+
             dataGridViewMail.RowHeadersVisible = false; // Soldaki alanı gizler
             dataGridViewMail.AllowUserToAddRows = false;
-     
+
 
             #endregion
 
@@ -137,6 +133,16 @@ namespace BotHizmetleri
             tabPageGosterGizle();
 
 
+        }
+        private void KillChromeDrivers()
+        {
+            //// Tüm Chrome ve ChromeDriver işlemlerini bul ve sonlandır
+            var chromeProcesses = Process.GetProcessesByName("chromedriver");/*.Concat(Process.GetProcessesByName("chrome"))*/;
+
+            foreach (var process in chromeProcesses)
+            {
+                process.Kill(); // İşlemi kapat
+            }
         }
         private async void AnaSayfa_Load(object sender, EventArgs e)
         {
@@ -343,7 +349,7 @@ namespace BotHizmetleri
 
             if (genelTarama_CheckBox.Checked)
             {
-                SemaphoreSlim semaphore = new SemaphoreSlim(2);
+                SemaphoreSlim semaphore = new SemaphoreSlim(Convert.ToInt32(semophireSayi.Value)); //2
                 int rowCount = dataGrid_Ilce.RowCount;
 
                 for (int i = 0; i < rowCount; i++)
@@ -429,18 +435,7 @@ namespace BotHizmetleri
                     }
                 }
                 await Task.WhenAll(tasks); // Tüm görevler tamamlanana kadar bekle
-                //var uniqueFirmalar = firmalarList
-                //      .GroupBy(f => f.FirmaAdi) // Firma adına göre gruplama
-                //      .Select(g => g.First()) // Her grup için yalnızca ilk elemanı seç
-                //      .ToList(); // Sonucu listeye dönüştür
 
-                //Invoke(new Action(() =>
-                //{
-                //    foreach (var firma in uniqueFirmalar)
-                //    {
-                //        dataGridView1.Rows.Add(firma.FirmaAdi, firma.Telefon, firma.Website, firma.EMail, firma.Adress);
-                //    }
-                //}));
             }
             else
             {
@@ -460,18 +455,7 @@ namespace BotHizmetleri
                 tasksTekil.Add(task);
                 await Task.WhenAll(tasksTekil);
                 UpdateTaskStatus($" {anahtarKelime} taraması başarıyla tamamlandı.", "completed");
-                //var uniqueFirmalar = firmalarList
-                //    .GroupBy(f => f.FirmaAdi) // Firma adına göre gruplama
-                //    .Select(g => g.First()) // Her grup için yalnızca ilk elemanı seç
-                //    .ToList(); // Sonucu listeye dönüştür
 
-                //Invoke(new Action(() =>
-                //{
-                //    foreach (var firma in uniqueFirmalar)
-                //    {
-                //        dataGridView1.Rows.Add(firma.FirmaAdi, firma.Telefon, firma.Website, firma.EMail, firma.Adress);
-                //    }
-                //}));
             }
             var uniqueFirmalar = firmalarList
                    .GroupBy(f => f.FirmaAdi) // Firma adına göre gruplama
@@ -602,15 +586,8 @@ namespace BotHizmetleri
                 var toplamVeri = driver.FindElements(By.ClassName("Nv2PK"));
 
 
-                if (adresleriTara_CheckBox.Checked) // Adres seçili ise. içerisinde mail adresi de seçiliyse kontrol eder.
-                {
-                    await VerileriCekVeAktar_AdressSecili(toplamVeri, driver, rowIndex);
-
-                }
-                else
-                {
-                    await VerileriCekVeAktar(toplamVeri, driver, rowIndex);
-                }
+                //await VerileriCekVeAktar(toplamVeri, driver, rowIndex);
+                await VerileriCekVeAktar_AdressSecili(toplamVeri, driver, rowIndex);
             }
             else
             {
@@ -646,25 +623,70 @@ namespace BotHizmetleri
 
                     // Verileri çek
                     string firmaAdi = TryFindElementAttribute(element, By.CssSelector("a.hfpxzc"), "aria-label").Replace("·Ziyaret edilmiş bağlantı", "").Trim();
-                    string telefon = TryFindElementText(element, By.XPath(".//div[contains(@class, 'W4Efsd')]//span[contains(@class, 'UsdlK')]")) ?? "";
-                    string website = TryFindElementAttribute(element, By.XPath(".//a[contains(@aria-label, 'web sitesini ziyaret et')]"), "href") ?? "";
-                    string adress = (string)js.ExecuteScript(@"return document.querySelector('.Io6YTe.fontBodyMedium.kR99db.fdkmkc') ? document.querySelector('.Io6YTe.fontBodyMedium.kR99db.fdkmkc').innerText : '';") ?? "";
+                    //string adress = (string)js.ExecuteScript(@"return document.querySelector('.Io6YTe.fontBodyMedium.kR99db.fdkmkc') ? document.querySelector('.Io6YTe.fontBodyMedium.kR99db.fdkmkc').innerText : '';") ?? "";
+                    var tiklananVerininElemanlari = driver.FindElements(By.CssSelector(".CsEnBe"));
+                    string telefon = "";
+                    string adress = "";
+                    string website = "";
+                    foreach (var elementx in tiklananVerininElemanlari)
+                    {
+                        string ariaLabel = elementx.GetAttribute("aria-label");
+                        if (!string.IsNullOrEmpty(ariaLabel))
+                        {
+                            if (ariaLabel.StartsWith("Telefon:"))
+                            {
+                                telefon = ariaLabel.Replace("Telefon: ", "").Trim(); // "Telefon: " kısmını kaldır ve numarayı al
+                            }
+                            else if (ariaLabel.StartsWith("Adres:"))
+                            {
+                                adress = ariaLabel.Replace("Adres: ", "").Trim();// "Adres: " kısmını kaldır ve adresi al
+                            }
+                            else if (ariaLabel.StartsWith("Web sitesi:"))
+                            {
+                                website = ariaLabel.Replace("Web sitesi: ", "").Trim();
+                            }
+                        }
+                    }
+                    // Boş değer kontrolü
+                    if (string.IsNullOrEmpty(telefon)) telefon = "";
+                    if (string.IsNullOrEmpty(adress)) adress = "";
+                    if (string.IsNullOrEmpty(website)) website = "";
 
-                    // Yeni firma bilgilerini oluştur
-                    var newFirma = new FirmaBilgileri
+                    
+                    if (!string.IsNullOrEmpty(telefon))
+                    {
+                        var aynıNoVarMi = firmalarList.Any(x => x.Telefon == telefon);
+                        //var aa = firmalarList.Where(x => x.Telefon == telefon);
+                        if (aynıNoVarMi)
+                        {
+                            telefon = "";
+                        }
+
+                    }
+
+                    // Verileri thread-safe olarak listeye ekle
+                    //lock (lockObject)
+                    //{
+                    //    // Yeni firma bilgilerini oluştur
+                    //    var newFirma = new FirmaBilgileri
+                    //    {
+                    //        FirmaAdi = firmaAdi,
+                    //        Telefon = telefon,
+                    //        Website = website,
+                    //        EMail = "", // Boş e-posta alanı
+                    //        Adress = adress
+                    //    };
+                    //    firmalarList.Add(newFirma);
+                    //}
+
+                    firmalarList.Add(new FirmaBilgileri
                     {
                         FirmaAdi = firmaAdi,
                         Telefon = telefon,
                         Website = website,
-                        EMail = "", // Boş e-posta alanı
+                        EMail = "",
                         Adress = adress
-                    };
-
-                    // Verileri thread-safe olarak listeye ekle
-                    lock (lockObject)
-                    {
-                        firmalarList.Add(newFirma);
-                    }
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -846,7 +868,9 @@ namespace BotHizmetleri
         #endregion
 
 
-        List<FirmaBilgileri> firmalarList = new();
+        //List<FirmaBilgileri> firmalarList = new();
+        ConcurrentBag<FirmaBilgileri> firmalarList = new ConcurrentBag<FirmaBilgileri>();
+
 
         private async Task VerileriCekVeAktar(ReadOnlyCollection<IWebElement> toplamVeri, ChromeDriver driver, int rowIndex)
         {
@@ -862,7 +886,7 @@ namespace BotHizmetleri
                 firmaAdi = TryFindElementAttribute(item, By.CssSelector("a.hfpxzc"), "aria-label");
 
                 // Telefon numarasını al
-                telefon = TryFindElementText(item, By.XPath(".//div[contains(@class, 'W4Efsd')]//span[contains(@class, 'UsdlK')]"));
+                telefon = TryFindElementText(item, By.XPath(".//div[contains(@class, 'rogA2c')]//div[contains(@class, 'Io6YTe')]"));
                 if (string.IsNullOrEmpty(telefon))
                 {
                     telefon = "";
@@ -1138,6 +1162,7 @@ namespace BotHizmetleri
             toplamVeri_Label.Text = "0";
             genelTarama_CheckBox.Checked = false;
             adresleriTara_CheckBox.Checked = false;
+            firmalarList = null;
         }
 
         private void excelKaydet_btnClick_Click(object sender, EventArgs e)
@@ -1640,7 +1665,7 @@ namespace BotHizmetleri
                 case "Natro":
                     smt_TextBox.Text = "mail.kurumsaleposta.com";
                     port_TextBox.Text = "587";
-                    break; 
+                    break;
                 case "Guzel Hosting":
                     smt_TextBox.Text = "mail.alanadiniz.com";
                     port_TextBox.Text = "587";
