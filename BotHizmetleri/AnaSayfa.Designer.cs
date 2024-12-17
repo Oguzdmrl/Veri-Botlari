@@ -860,6 +860,7 @@
             adresleriTara_CheckBox.TabIndex = 21;
             adresleriTara_CheckBox.Text = "Adres Bilgileri";
             adresleriTara_CheckBox.UseVisualStyleBackColor = true;
+            adresleriTara_CheckBox.Visible = false;
             // 
             // Il_ComboBox
             // 
